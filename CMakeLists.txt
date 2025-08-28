@@ -31,6 +31,7 @@ include_directories(include)
 add_library(sobel_core
     src/image.cpp
     src/image_io.cpp
+    src/sobel_filter.cpp
 )
 
 # Main executable (will implement gradually)
