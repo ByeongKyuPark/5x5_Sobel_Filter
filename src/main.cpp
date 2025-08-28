@@ -6,6 +6,7 @@
 
 #include "image.hpp"
 #include "image_io.hpp"
+#include "sobel_filter.hpp"
 #include <iostream>
 #include <string>
 
@@ -48,25 +49,23 @@ int main(int argc, char* argv[]) {
     std::cout << "Image loaded successfully (" << result.getValue().width() << "x" 
               << result.getValue().height() << " pixels)\n";
     
-    // Convert to grayscale for demonstration
-    sobel::GrayscaleImage grayImage(IMAGE_WIDTH, IMAGE_HEIGHT);
-    for (std::size_t y = 0; y < IMAGE_HEIGHT; ++y) {
-        for (std::size_t x = 0; x < IMAGE_WIDTH; ++x) {
-            grayImage.setPixel(x, y, result.getValue().at(x, y).toGrayscale());
-        }
-    }
+    // Apply 5x5 Sobel edge detection
+    std::cout << "Applying 5x5 Sobel edge detection...\n";
     
-    std::cout << "Converted to grayscale. Saving output...\n";
+    sobel::SobelFilter filter;
+    auto edgeImage = filter.apply(result.getValue());
     
-    // Save grayscale image (placeholder for edge detection)
-    auto saveResult = sobel::ImageIO::saveGrayscaleImage(grayImage, outputFile);
+    std::cout << "Edge detection completed. Saving output...\n";
+    
+    // Save edge-detected image
+    auto saveResult = sobel::ImageIO::saveGrayscaleImage(edgeImage, outputFile);
     if (!saveResult) {
         std::cerr << "Error saving image: " << toString(saveResult.getError()) << std::endl;
         return 1;
     }
     
-    std::cout << "Processing complete! Output saved to: " << outputFile << "\n";
-    std::cout << "Note: Sobel edge detection will be implemented in next phase.\n";
+    std::cout << "Edge detection complete! Output saved to: " << outputFile << "\n";
+    std::cout << "5x5 Sobel filter successfully applied.\n";
     
     return 0;
 }
