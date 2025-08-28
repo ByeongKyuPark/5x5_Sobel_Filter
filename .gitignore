@@ -21,12 +21,33 @@ build/
 # Temporary files
 *.tmp
 *.temp
+*.bak
+*.old
+
+# Test outputs
+*.bmp
+test_output_*
+*_output.raw
+*_edges.raw
+
+# PowerShell scripts (temporary)
+test_*.ps1
 
 # CMake cache
 CMakeCache.txt
 CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
 
 # Visual Studio
 *.vcxproj
 *.vcxproj.filters
 *.sln
+*.dir/
+x64/
+ALL_BUILD*
+RUN_TESTS*
+ZERO_CHECK*
+
+# Temporary documentation
+PHASE*_COMPLETE.md
