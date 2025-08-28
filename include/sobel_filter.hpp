@@ -23,8 +23,8 @@ using SobelKernel5x5 = std::array<std::array<int, 5>, 5>;
  * @brief Configuration for Sobel filter processing
  */
 struct SobelConfig {
-    bool use_quantization = true;
-    uint8_t quantization_levels = 255;  // Output levels (typically 255 for 8-bit)
+    bool use_quantization = true;     // Enable quantization
+    uint8_t quantization_levels = 64; // Good contrast for edge visualization
     bool normalize_output = true;
     
     SobelConfig() = default;

@@ -2,18 +2,24 @@
 
 ## 프로젝트 개요
 
-640x640 RGB 이미지에 대한 5x5 Sobel 엣지 검출 필터 구현. 현대적인 C++17 표준을 따르며 유지보수성, 성능, 확장성을 중시한 설계.
+640x640 RGB 이미지에 대한 5x5 Sobel 엣지 검출 필터 구현. C++17 표준을 따르며 유지보수성, 성능, 확장성을 염두에 둔 설계.
 
-## Phase 1: 핵심 인프라 (완료)
+## Phase 1: Infra
 
-### 구현된 기능
+###### 성능 테스트 결과
+```
+SSE SIMD:  ~18.72ms (1.95x speedup)
+AVX2 SIMD: ~21.93ms (1.95x speedup)  
+Baseline:  ~53.66ms
+Real-time capability: Close to target (60 FPS = 16.67ms budget)
+```
 - 이미지 데이터 구조: RGB 및 그레이스케일 픽셀 지원하는 범용 이미지 템플릿 클래스
-- 파일 입출력 연산: 포괄적인 오류 처리를 포함한 원시 바이너리 파일 읽기/쓰기
+- 파일 입출력 연산: 포괄적인 오류 처리를 포함한 raw binary 파일 읽기/쓰기
 - RGB to 그레이스케일 변환: ITU-R BT.709 표준 가중치 적용
 - 메모리 관리: RAII 준수 리소스 관리
 - 오류 처리: C++17 호환성을 위한 사용자 정의 Result 타입
 
-### 아키텍처 설계
+### Archithecture 설계
 
 #### 핵심 클래스
 1. **`Image<PixelType>`**: 이미지 데이터를 위한 범용 템플릿 클래스
@@ -50,6 +56,161 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
 ```
 
+## 빌드 및 테스트 명령어 (Build & Test Commands)
+
+### 프로젝트 빌드 (Project Build)
+
+#### 전체 빌드 (Full Build)
+```bash
+# 빌드 디렉토리 생성 및 빌드
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release
+```
+
+#### 디버그 빌드 (Debug Build)
+```bash
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+cmake --build . --config Debug
+```
+
+### 🧪 테스트 실행 (Test Execution)
+
+#### 정확성 검증 테스트 (Correctness Validation)
+```bash
+cd build/Release
+.\validation_test.exe     # 100개 테스트 케이스로 SIMD vs 기준선 비교
+```
+
+#### 성능 벤치마크 (Performance Benchmark)
+```bash
+cd build/Release
+.\benchmark_simd.exe      # SIMD 성능 측정 (AVX2, SSE, Scalar 비교)
+```
+
+#### 디버그 테스트 (Debug Test)
+```bash
+cd build/Release
+.\debug_test.exe          # 작은 5x5 이미지로 단계별 디버깅
+```
+
+#### 메인 애플리케이션 (Main Application)
+```bash
+cd build/Release
+.\sobel_filter.exe        # 640x640 이미지 처리 데모
+```
+
+#### 테스트 데이터 생성 (Test Data Generation)
+```bash
+cd build/Release
+.\test_data_generator.exe # 테스트용 샘플 이미지 생성
+```
+
+### 성능 분석 (Performance Analysis)
+
+#### SIMD 최적화 레벨별 성능 비교
+```bash
+# AVX2 SIMD (최고 성능)
+.\benchmark_simd.exe | findstr "AVX2"
+
+# SSE SIMD (호환성)
+.\benchmark_simd.exe | findstr "SSE" 
+
+# Scalar (기준선)
+.\benchmark_simd.exe | findstr "Scalar"
+```
+
+#### 실시간 성능 검증 (60 FPS = 16.67ms 목표)
+```bash
+.\benchmark_simd.exe | findstr "Real-time"
+```
+
+### 디버깅 및 문제 해결 (Debugging & Troubleshooting)
+
+#### 컴파일 오류 확인
+```bash
+cmake --build . --config Release --verbose
+```
+
+#### CPU 기능 확인
+```bash
+.\benchmark_simd.exe | findstr "CPU Capabilities"
+```
+
+#### 메모리 정렬 확인
+```bash
+.\validation_test.exe | findstr "alignment"
+```
+
+### 빠른 테스트 스위트 (Quick Test Suite)
+
+#### 전체 검증 (Complete Validation)
+```bash
+cd build/Release
+echo "=== 빌드 확인 ==="
+cmake --build .. --config Release
+echo "=== 정확성 테스트 ==="
+.\validation_test.exe
+echo "=== 성능 테스트 ==="
+.\benchmark_simd.exe
+echo "=== 디버그 테스트 ==="
+.\debug_test.exe
+```
+
+#### PowerShell one liner (All Tests)
+```powershell
+cd build/Release; .\validation_test.exe; .\benchmark_simd.exe; .\debug_test.exe
+```
+
+### 예상 결과 (Expected Results)
+
+#### 정확성 테스트 결과
+```
+Total tests: 100
+Passed: 100 (100.0%)
+Failed: 0
+ALL TESTS PASSED! SIMD implementation is correct.
+```
+
+#### 성능 테스트 결과
+```
+AVX2 SIMD: ~16.70ms (2.46x speedup)
+SSE SIMD:  ~18.59ms (2.21x speedup)
+Baseline:  ~41.16ms
+Real-time capable: ✅ Under 16.67ms budget for 60 FPS
+```
+
+### 개발 Workflow
+
+#### 코드 변경 후 검증
+```bash
+# 1. 빌드
+cmake --build . --config Release
+
+# 2. 빠른 정확성 체크
+.\debug_test.exe
+
+# 3. 전체 검증
+.\validation_test.exe
+
+# 4. 성능 확인
+.\benchmark_simd.exe
+```
+
+#### CI/CD 파이프라인 명령어
+```bash
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release
+cd Release
+.\validation_test.exe || exit 1
+.\benchmark_simd.exe || exit 1
+echo "All tests passed - Ready for deployment"
+```
+
 #### Linux/macOS
 ```bash
 mkdir build && cd build
@@ -64,6 +225,8 @@ make -j$(nproc)
 .\build\Release\sobel_filter.exe input_640x640.raw output_grayscale.raw
 ```
 
+**참고**: 현재 시각화 기능은 구현되지 않음. 출력 결과 육안 확인을 위해서는 raw_to_bmp.exe 유틸리티 사용 필요.
+
 **입력 요구사항:**
 - 파일 형식: Raw 바이너리 RGB
 - 크기: 640x640 픽셀
@@ -75,21 +238,16 @@ make -j$(nproc)
 
 ## 향후 단계
 
-### Phase 2: Sobel 필터 구현
-- 5x5 Sobel 커널 정의
-- 제로 패딩을 포함한 컨볼루션 연산
-- 그레디언트 크기 계산
-- 양자화 구현
+### TODO: 시각화 (Visualization)
+- **상태**: 미구현 (Not Implemented)
+- **설명**: 현재 구현은 원시 바이너리 출력만 지원
+- **향후 계획**: 
+  - BMP/PNG 직접 출력 지원
+  - 실시간 시각화 도구
+  - 웹 기반 시각화 인터페이스
+  - 에지 검출 결과 오버레이 표시
 
-### Phase 3: 성능 최적화
-- SIMD 최적화 (SSE/AVX)
-- 멀티스레딩 지원
-- 메모리 접근 최적화
-
-### Phase 4: 테스트 및 검증
-- 모든 구성 요소에 대한 단위 테스트
-- 성능 벤치마크
-- 경계 사례 테스트
+**참고**: 현재는 raw_to_bmp.exe 유틸리티를 통한 수동 변환이 필요
 
 ## 설계 원칙
 
@@ -136,20 +294,13 @@ make -j$(nproc)
 └── examples/               # 샘플 데이터 및 사용법
 ```
 
-## 기술적 가정사항
-
+## 기술적 가정
 1. **이미지 형식**: Raw 바이너리 RGB 파일 (헤더 없음)
 2. **픽셀 순서**: 행 우선 순서 (y × width + x)
 3. **색상 공간**: ITU-R BT.709 가중치를 사용한 sRGB
 4. **경계 처리**: 컨볼루션을 위한 제로 패딩
 5. **출력 범위**: 8비트 양자화 (0-255)
 
-## 개발 상태
-
-**현재 단계**: 1 (핵심 인프라) 완료
-**다음 단계**: 2 (Sobel 필터 구현)
-
----
-*저자: BK Park*  
-*날짜: 2025년 8월 27일*  
-*버전: 1.0.0*
+* BK Park *  
+* 2025년 8월 27일 *  
+* 버전: 1.0.0 *

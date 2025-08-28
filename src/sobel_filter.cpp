@@ -99,16 +99,18 @@ std::vector<int16_t> SobelFilter::convolve(const GrayscaleImage& image,
         for (std::size_t x = 0; x < width; ++x) {
             int32_t sum = 0;
             
-            // Apply 5x5 kernel with zero-padding
+            // Apply 5x5 kernel with edge replication instead of zero-padding
             for (int ky = -kernel_half; ky <= kernel_half; ++ky) {
                 for (int kx = -kernel_half; kx <= kernel_half; ++kx) {
-                    // Use safe pixel access with zero padding
-                    uint8_t pixel_value = image.getPixelSafe(
-                        static_cast<int>(x) + kx, 
-                        static_cast<int>(y) + ky, 
-                        0  // zero padding
-                    );
+                    // Use edge replication instead of zero padding
+                    int px = static_cast<int>(x) + kx;
+                    int py = static_cast<int>(y) + ky;
                     
+                    // Clamp coordinates to image boundaries (edge replication)
+                    px = std::max(0, std::min(px, static_cast<int>(width) - 1));
+                    py = std::max(0, std::min(py, static_cast<int>(height) - 1));
+                    
+                    uint8_t pixel_value = image.at(px, py);
                     int kernel_value = kernel[ky + kernel_half][kx + kernel_half];
                     sum += pixel_value * kernel_value;
                 }
