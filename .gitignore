@@ -1,0 +1,32 @@
+# Build directory
+build/
+
+# IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln.docstates
+
+# Compiled binaries
+*.exe
+*.dll
+*.lib
+*.obj
+*.o
+
+# Test data files
+*.raw
+
+# Temporary files
+*.tmp
+*.temp
+
+# CMake cache
+CMakeCache.txt
+CMakeFiles/
+
+# Visual Studio
+*.vcxproj
+*.vcxproj.filters
+*.sln
