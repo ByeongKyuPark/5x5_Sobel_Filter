@@ -2,7 +2,7 @@
 
 ## 프로젝트 개요
 
-640x640 RGB 이미지에 대한 5x5 Sobel 엣지 검출 필터 구현. C++17 표준을 따르며 유지보수성, 성능, 확장성을 염두에 둔 설계.
+640x640 RGB 이미지에 대한 5x5 Sobel 엣지 검출 필터 구현. C++17 표준을 따르며 유지보수성, 성능, 확장성을 고려한 설계.
 
 ## Phase 1: Infra
 
@@ -30,7 +30,7 @@ Real-time capability: Close to target (60 FPS = 16.67ms budget)
 2. **`ImageIO`**: 파일 연산을 위한 정적 유틸리티 클래스
    - 처리 전 파일 크기 검증
    - 오류 처리를 위한 사용자 정의 Result 타입
-   - 원시 바이너리 형식 지원
+   - raw binary 형식 지원
 
 3. **`RGBPixel`**: 변환 유틸리티를 포함한 RGB 픽셀 구조체
    - 채널당 8비트 저장
@@ -41,7 +41,7 @@ Real-time capability: Close to target (60 FPS = 16.67ms budget)
 - **C++ 표준**: C++17
 - **컴파일러**: MSVC 19.41+ / GCC 7+ / Clang 5+
 - **빌드 시스템**: CMake 3.12+
-- **플랫폼**: Windows (주), Linux/macOS 호환
+- **플랫폼**: Windows(Primary), Linux/macOS 호환
 
 ### 빌드 방법
 
@@ -77,7 +77,7 @@ cmake .. -DCMAKE_BUILD_TYPE=Debug
 cmake --build . --config Debug
 ```
 
-### 🧪 테스트 실행 (Test Execution)
+### 테스트 실행 (Test Execution)
 
 #### 정확성 검증 테스트 (Correctness Validation)
 ```bash
@@ -180,7 +180,7 @@ ALL TESTS PASSED! SIMD implementation is correct.
 AVX2 SIMD: ~16.70ms (2.46x speedup)
 SSE SIMD:  ~18.59ms (2.21x speedup)
 Baseline:  ~41.16ms
-Real-time capable: ✅ Under 16.67ms budget for 60 FPS
+Real-time capable: Under 16.67ms budget for 60 FPS
 ```
 
 ### 개발 Workflow
@@ -228,12 +228,12 @@ make -j$(nproc)
 **참고**: 현재 시각화 기능은 구현되지 않음. 출력 결과 육안 확인을 위해서는 raw_to_bmp.exe 유틸리티 사용 필요.
 
 **입력 요구사항:**
-- 파일 형식: Raw 바이너리 RGB
+- 파일 형식: Raw Binary RGB
 - 크기: 640x640 픽셀
 - 사이즈: 1,228,800 바이트 (640 × 640 × 3)
 
 **출력:**
-- 파일 형식: Raw 바이너리 그레이스케일
+- 파일 형식: Raw Binary 그레이스케일
 - 사이즈: 409,600 바이트 (640 × 640 × 1)
 
 ## 향후 단계
@@ -294,13 +294,15 @@ make -j$(nproc)
 └── examples/               # 샘플 데이터 및 사용법
 ```
 
-## 기술적 가정
+## Technical 가정
 1. **이미지 형식**: Raw 바이너리 RGB 파일 (헤더 없음)
 2. **픽셀 순서**: 행 우선 순서 (y × width + x)
 3. **색상 공간**: ITU-R BT.709 가중치를 사용한 sRGB
 4. **경계 처리**: 컨볼루션을 위한 제로 패딩
 5. **출력 범위**: 8비트 양자화 (0-255)
 
-* BK Park *  
-* 2025년 8월 27일 *  
-* 버전: 1.0.0 *
+
+---
+* BK Park  
+* 2025년 8월 27일
+* 1.0.0
